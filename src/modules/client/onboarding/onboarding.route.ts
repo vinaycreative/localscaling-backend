@@ -1,9 +1,14 @@
-import { authMiddleware } from "@/middleware/authMiddleware";
 import { Router } from "express";
-import { saveBusinessInfoController } from "./onboarding.controller";
+import {
+  saveBrandingController,
+  saveBusinessInfoController,
+  saveWebsiteInfoController,
+} from "./onboarding.controller";
 
 const router = Router();
 
-router.post("/business-info", authMiddleware, saveBusinessInfoController);
+router.post("/business-info", saveBusinessInfoController);
+router.post("/website", saveWebsiteInfoController);
+router.post("/branding", saveBrandingController);
 
 export default router;

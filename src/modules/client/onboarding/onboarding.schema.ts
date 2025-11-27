@@ -68,3 +68,18 @@ export const brandingSchema = z.object({
 });
 
 export type BrandingInput = z.infer<typeof brandingSchema>;
+
+export const websiteSchema = z.object({
+  client_id: z.uuid("Invalid Client ID"),
+  domain_provider: z
+    .string()
+    .min(1, "Domain provider is required")
+    .optional()
+    .or(z.literal("")),
+  business_clients_worked: z.array(z.string()).optional(),
+  legal_docs: z.array(z.string().url("Invalid Legal Doc URL")).optional(),
+  legal_links: z.array(z.string().url("Invalid Legal Link URL")).optional(),
+  seo_locations: z.array(z.string().min(1)).optional(),
+});
+
+export type WebsiteInput = z.infer<typeof websiteSchema>;

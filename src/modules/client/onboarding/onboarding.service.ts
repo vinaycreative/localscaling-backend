@@ -1,5 +1,9 @@
 import { supabaseAdmin } from "@/config/db";
-import { BrandingInput, BusinessInfoInput } from "./onboarding.schema";
+import {
+  BrandingInput,
+  BusinessInfoInput,
+  WebsiteInput,
+} from "./onboarding.schema";
 
 export const saveBusinessInfoService = async (
   userId: string,
@@ -67,6 +71,38 @@ export const saveBrandingService = async (data: BrandingInput) => {
 
   if (error) {
     throw new Error(`Failed to save branding assets: ${error.message}`);
+  }
+
+  return savedData;
+};
+
+export const saveWebsiteInfoService = async (data: WebsiteInput) => {
+  const { client_id, ...websiteData } = data;
+  const { data: clientExists, error: checkError } = await supabaseAdmin
+    .from("clients")
+    .select("id")
+    .eq("id", client_id)
+    .single();
+
+  if (checkError || !clientExists) {
+    throw new Error("Client not found. Please start from the beginning.");
+  }
+
+  const { data: savedData, error } = await supabaseAdmin
+    .from("website_info")
+    .upsert(
+      {
+        client_id,
+        ...websiteData,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "client_id" }
+    )
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to save website info: ${error.message}`);
   }
 
   return savedData;
