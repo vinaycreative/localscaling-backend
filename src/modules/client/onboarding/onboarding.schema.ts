@@ -28,3 +28,43 @@ export const businessInfoSchema = z.object({
 });
 
 export type BusinessInfoInput = z.infer<typeof businessInfoSchema>;
+
+const hexColorRegex = /^#([0-9A-F]{3}){1,2}$/i;
+
+export const brandingSchema = z.object({
+  client_id: z.string().uuid("Invalid Client ID"),
+
+  brand_color_primary: z
+    .string()
+    .regex(hexColorRegex, "Invalid Hex Color")
+    .optional(),
+  brand_color_secondary: z
+    .string()
+    .regex(hexColorRegex, "Invalid Hex Color")
+    .optional(),
+
+  font_link: z.string().optional(),
+  company_logo_url: z.url("Invalid Logo URL").optional().or(z.literal("")),
+
+  team_photos_url: z.array(z.url()).optional(),
+  video_testimonials_urls: z.array(z.url()).optional(),
+  ceo_intro_video_url: z
+    .string()
+    .url("Invalid Video URL")
+    .optional()
+    .or(z.literal("")),
+
+  team_members: z
+    .array(
+      z.object({
+        name: z.string(),
+        position: z.string(),
+        bio: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  total_team_members: z.number().int().nonnegative().optional(),
+});
+
+export type BrandingInput = z.infer<typeof brandingSchema>;

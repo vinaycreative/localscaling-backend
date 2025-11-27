@@ -2,8 +2,11 @@ import { AuthRequest } from "@/middleware/authMiddleware";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { sendSuccess } from "@/utils/response";
 import { Response } from "express";
-import { businessInfoSchema } from "./onboarding.schema";
-import { saveBusinessInfoService } from "./onboarding.service";
+import { brandingSchema, businessInfoSchema } from "./onboarding.schema";
+import {
+  saveBrandingService,
+  saveBusinessInfoService,
+} from "./onboarding.service";
 
 export const saveBusinessInfoController = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -18,5 +21,14 @@ export const saveBusinessInfoController = asyncHandler(
     const result = await saveBusinessInfoService(userId, payload);
 
     return sendSuccess(res, "Business information saved successfully", result);
+  }
+);
+
+export const saveBrandingController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const payload = await brandingSchema.parseAsync(req.body);
+    const result = await saveBrandingService(payload);
+
+    return sendSuccess(res, "Branding assets saved successfully", result);
   }
 );
