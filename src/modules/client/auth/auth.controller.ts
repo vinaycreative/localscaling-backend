@@ -39,6 +39,22 @@ export const loginUserController = asyncHandler(
   }
 );
 
+export const devLoginController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const email = "jane.doe@example.com";
+    const password = "super_secret_password_123";
+
+    const { token, user } = await loginService({ email, password });
+
+    res.cookie(COOKIE_NAME, token, {
+      ...getCookieOptions(),
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    return sendSuccess(res, "Dev Login successful", user);
+  }
+);
+
 export const signUpUserController = asyncHandler(
   async (req: Request, res: Response) => {
     const { email, password } = await signUpSchema.parseAsync(req.body);
@@ -82,3 +98,4 @@ export const logoutUserController = asyncHandler(
     return sendSuccess(res, "Logged out successfully");
   }
 );
+
