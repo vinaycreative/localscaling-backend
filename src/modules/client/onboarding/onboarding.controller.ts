@@ -5,12 +5,15 @@ import { Response } from "express";
 import {
   brandingSchema,
   businessFormSchema,
+  locationsBudgetSchema,
   WebsiteSetupPayload,
 } from "./onboarding.schema";
 import {
+  getAdsBudgetService,
   getBrandingService,
   getBusinessInfoService,
   getWebsiteSetupService,
+  saveAdsBudgetService,
   saveBrandingService,
   saveBusinessInfoService,
   saveWebsiteSetupService,
@@ -118,5 +121,37 @@ export const saveWebsiteSetupController = asyncHandler(
     const result = await saveWebsiteSetupService(userId, payload);
 
     return sendSuccess(res, "Website setup saved successfully", result);
+  }
+);
+
+export const getAdsBudgetController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401);
+      throw new Error("Unauthorized");
+    }
+
+    const result = await getAdsBudgetService(userId);
+
+    return sendSuccess(res, "Ads budget fetched successfully", result);
+  }
+);
+
+export const saveAdsBudgetController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401);
+      throw new Error("Unauthorized: User ID missing");
+    }
+
+    const payload = await locationsBudgetSchema.parseAsync(req.body);
+
+    const result = await saveAdsBudgetService(userId, payload);
+
+    return sendSuccess(res, "Ads budget saved successfully", result);
   }
 );

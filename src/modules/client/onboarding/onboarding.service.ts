@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/config/db";
 import {
   BrandingPayload,
   BusinessFormData,
+  LocationsBudgetForm,
   WebsiteSetupPayload,
 } from "./onboarding.schema";
 
@@ -372,4 +373,125 @@ export const saveWebsiteSetupService = async (
     ...mapWebsiteSetupFromDb(data),
     accessGranted: payload.accessGranted,
   };
+};
+
+function mapAdsBudgetFromDb(data: any): LocationsBudgetForm {
+  return {
+    budget: data.monthly_budget ? String(data.monthly_budget) : "",
+    currency: data.currency || "EUR",
+    locations: data.seo_locations || [],
+    services: data.services_provided || [],
+  };
+}
+
+function mapAdsBudgetToDb(data: LocationsBudgetForm, clientId: string) {
+  return {
+    client_id: clientId,
+    monthly_budget: Number(data.budget),
+    currency: data.currency,
+    seo_locations: data.locations,
+    services_provided: data.services,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+export const getAdsBudgetService = async (userId: string) => {
+  console.log(`[getAdsBudget] 🟢 Starting fetch for User ID: ${userId}`);
+
+  const { data: client, error: clientError } = await supabaseAdmin
+    .from("clients")
+    .select("id")
+    .eq("user_id", userId)
+    .single();
+
+  if (clientError || !client) {
+    console.log(`[getAdsBudget] 🟡 Client not found for User ID: ${userId}`);
+    return null;
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from("ads_budget")
+    .select("*")
+    .eq("client_id", client.id)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    console.error(`[getAdsBudget] 🔴 DB Error:`, error.message);
+    throw new Error(`Database error fetching ads budget: ${error.message}`);
+  }
+
+  if (!data) {
+    console.log(
+      `[getAdsBudget] 🟡 No ads budget found for Client ID: ${client.id}`
+    );
+    return null;
+  }
+
+  console.log(`[getAdsBudget] ✅ Data retrieved successfully.`);
+  return mapAdsBudgetFromDb(data);
+};
+
+export const saveAdsBudgetService = async (
+  userId: string,
+  payload: LocationsBudgetForm
+) => {
+  console.log(`[saveAdsBudget] 🟢 Starting save for User ID: ${userId}`);
+
+  const { data: client, error: clientError } = await supabaseAdmin
+    .from("clients")
+    .select("id")
+    .eq("user_id", userId)
+    .single();
+
+  if (clientError || !client) {
+    console.error(`[saveAdsBudget] 🔴 Client not found for User ID: ${userId}`);
+    throw new Error(
+      "Client profile not found. Please complete the Business Information step first."
+    );
+  }
+
+  const dbData = mapAdsBudgetToDb(payload, client.id);
+
+  console.log(
+    `[saveAdsBudget] ⏳ Checking for existing ads budget for Client ID: ${client.id}...`
+  );
+
+  // Manual upsert: Check if record exists first to avoid unique constraint error
+  const { data: existingBudget } = await supabaseAdmin
+    .from("ads_budget")
+    .select("id")
+    .eq("client_id", client.id)
+    .single();
+
+  let data, error;
+
+  if (existingBudget) {
+    console.log(`[saveAdsBudget] 🔄 Updating existing budget...`);
+    const result = await supabaseAdmin
+      .from("ads_budget")
+      .update(dbData)
+      .eq("client_id", client.id)
+      .select()
+      .single();
+    data = result.data;
+    error = result.error;
+  } else {
+    console.log(`[saveAdsBudget] 🆕 Creating new budget...`);
+    const result = await supabaseAdmin
+      .from("ads_budget")
+      .insert(dbData)
+      .select()
+      .single();
+    data = result.data;
+    error = result.error;
+  }
+
+  if (error) {
+    console.error(`[saveAdsBudget] 🔴 DB Error:`, error.message);
+    throw new Error(`Failed to save ads budget: ${error.message}`);
+  }
+
+  console.log(`[saveAdsBudget] ✅ Save successful.`);
+
+  return mapAdsBudgetFromDb(data);
 };

@@ -67,8 +67,21 @@ export const websiteSetupSchema = z.object({
   legalLinks: z
     .array(z.string().url({ message: "Invalid URL in legal links" }))
     .default([]),
-  legalFiles: z.array(z.string()).default([]), // specific URL validation optional depending on storage return format
+  legalFiles: z.array(z.string()).default([]),
   seoLocations: z.array(z.string()).default([]),
 });
 
 export type WebsiteSetupPayload = z.infer<typeof websiteSetupSchema>;
+
+export const locationsBudgetSchema = z.object({
+  budget: z.string().min(1, { message: "Budget is required" }),
+  currency: z.string().min(1, { message: "Currency is required" }),
+  locations: z
+    .array(z.string())
+    .min(1, { message: "At least one location is required" }),
+  services: z
+    .array(z.string())
+    .min(1, { message: "At least one service is required" }),
+});
+
+export type LocationsBudgetForm = z.infer<typeof locationsBudgetSchema>;
