@@ -60,17 +60,15 @@ export const brandingSchema = z.object({
 
 export type BrandingPayload = z.infer<typeof brandingSchema>;
 
-export const websiteSchema = z.object({
-  client_id: z.uuid("Invalid Client ID"),
-  domain_provider: z
-    .string()
-    .min(1, "Domain provider is required")
-    .optional()
-    .or(z.literal("")),
-  business_clients_worked: z.array(z.string()).optional(),
-  legal_docs: z.array(z.string().url("Invalid Legal Doc URL")).optional(),
-  legal_links: z.array(z.string().url("Invalid Legal Link URL")).optional(),
-  seo_locations: z.array(z.string().min(1)).optional(),
+export const websiteSetupSchema = z.object({
+  accessGranted: z.boolean().default(false),
+  domainProvider: z.string().min(1, { message: "Domain provider is required" }),
+  businessClientsWorked: z.array(z.string()).default([]),
+  legalLinks: z
+    .array(z.string().url({ message: "Invalid URL in legal links" }))
+    .default([]),
+  legalFiles: z.array(z.string()).default([]), // specific URL validation optional depending on storage return format
+  seoLocations: z.array(z.string()).default([]),
 });
 
-export type WebsiteInput = z.infer<typeof websiteSchema>;
+export type WebsiteSetupPayload = z.infer<typeof websiteSetupSchema>;

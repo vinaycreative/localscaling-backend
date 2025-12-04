@@ -2,7 +2,7 @@ import { supabaseAdmin } from "@/config/db";
 import {
   BrandingPayload,
   BusinessFormData,
-  WebsiteInput,
+  WebsiteSetupPayload,
 } from "./onboarding.schema";
 
 function mapToDb(data: BusinessFormData, userId: string) {
@@ -249,6 +249,8 @@ export const saveBrandingService = async (
     .select()
     .single();
 
+  console.log("savedData is ", savedData);
+
   if (error) {
     console.error(`[saveBranding] 🔴 DB Error:`, error.message);
     throw new Error(`Failed to save branding assets: ${error.message}`);
@@ -258,34 +260,116 @@ export const saveBrandingService = async (
   return savedData;
 };
 
-export const saveWebsiteInfoService = async (data: WebsiteInput) => {
-  const { client_id, ...websiteData } = data;
-  const { data: clientExists, error: checkError } = await supabaseAdmin
+function mapWebsiteSetupFromDb(data: any): WebsiteSetupPayload {
+  return {
+    accessGranted: false,
+    domainProvider: data.domain_provider || "",
+    businessClientsWorked: data.business_clients_worked || [],
+    legalFiles: data.legal_docs || [],
+    legalLinks: data.legal_links || [],
+    seoLocations: data.seo_locations || [],
+  };
+}
+
+function mapWebsiteSetupToDb(payload: WebsiteSetupPayload, userId: string) {
+  return {
+    client_id: userId,
+    domain_provider: payload.domainProvider,
+    business_clients_worked: payload.businessClientsWorked,
+    legal_docs: payload.legalFiles,
+    legal_links: payload.legalLinks,
+    seo_locations: payload.seoLocations,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+export const getWebsiteSetupService = async (userId: string) => {
+  console.log(`[getWebsiteSetup] 🟢 Starting fetch for User ID: ${userId}`);
+
+  // 1. Get Client ID from User ID
+  const { data: client, error: clientError } = await supabaseAdmin
     .from("clients")
     .select("id")
-    .eq("id", client_id)
+    .eq("user_id", userId) // Assuming clients table has a user_id column
     .single();
 
-  if (checkError || !clientExists) {
-    throw new Error("Client not found. Please start from the beginning.");
+  if (clientError || !client) {
+    console.log(`[getWebsiteSetup] 🟡 Client not found for User ID: ${userId}`);
+    return null; // No client means no website info yet
   }
 
-  const { data: savedData, error } = await supabaseAdmin
+  // 2. Fetch Website Info using Client ID
+  const { data, error } = await supabaseAdmin
     .from("website_info")
-    .upsert(
-      {
-        client_id,
-        ...websiteData,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "client_id" }
-    )
+    .select("*")
+    .eq("client_id", client.id)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    console.error(`[getWebsiteSetup] 🔴 DB Error:`, error.message);
+    throw new Error(`Database error fetching website info: ${error.message}`);
+  }
+
+  if (!data) {
+    console.log(
+      `[getWebsiteSetup] 🟡 No website info found for Client ID: ${client.id}`
+    );
+    return null;
+  }
+
+  console.log(`[getWebsiteSetup] ✅ Data retrieved successfully.`);
+  return mapWebsiteSetupFromDb(data);
+};
+
+export const saveWebsiteSetupService = async (
+  userId: string,
+  payload: WebsiteSetupPayload
+) => {
+  console.log(`[saveWebsiteSetup] 🟢 Starting save for User ID: ${userId}`);
+
+  // Validation
+  if (!payload.domainProvider) {
+    throw new Error("Domain provider is required.");
+  }
+
+  // 1. Find the Client ID first! (CRITICAL FIX)
+  const { data: client, error: clientError } = await supabaseAdmin
+    .from("clients")
+    .select("id")
+    .eq("user_id", userId)
+    .single();
+
+  if (clientError || !client) {
+    console.error(
+      `[saveWebsiteSetup] 🔴 Client not found for User ID: ${userId}`
+    );
+    throw new Error(
+      "Client profile not found. Please complete the Business Information step first."
+    );
+  }
+
+  // 2. Use the Client ID for the website_info mapping
+  const dbData = mapWebsiteSetupToDb(payload, client.id);
+
+  console.log(
+    `[saveWebsiteSetup] ⏳ Upserting website info for Client ID: ${client.id}...`
+  );
+
+  const { data, error } = await supabaseAdmin
+    .from("website_info")
+    .upsert(dbData, { onConflict: "client_id" })
     .select()
     .single();
 
   if (error) {
-    throw new Error(`Failed to save website info: ${error.message}`);
+    console.error(`[saveWebsiteSetup] 🔴 DB Error:`, error.message);
+    throw new Error(`Failed to save website information: ${error.message}`);
   }
 
-  return savedData;
+  console.log(`[saveWebsiteSetup] ✅ Save successful.`);
+
+  return {
+    ...mapWebsiteSetupFromDb(data),
+    accessGranted: payload.accessGranted,
+  };
 };

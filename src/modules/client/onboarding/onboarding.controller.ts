@@ -5,14 +5,15 @@ import { Response } from "express";
 import {
   brandingSchema,
   businessFormSchema,
-  websiteSchema,
+  WebsiteSetupPayload,
 } from "./onboarding.schema";
 import {
   getBrandingService,
   getBusinessInfoService,
+  getWebsiteSetupService,
   saveBrandingService,
   saveBusinessInfoService,
-  saveWebsiteInfoService,
+  saveWebsiteSetupService,
 } from "./onboarding.service";
 
 export const getBusinessInfoController = asyncHandler(
@@ -85,11 +86,37 @@ export const saveBrandingController = asyncHandler(
   }
 );
 
-export const saveWebsiteInfoController = asyncHandler(
+export const getWebsiteSetupController = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const payload = await websiteSchema.parseAsync(req.body);
-    const result = await saveWebsiteInfoService(payload);
+    const userId = req.user?.id;
 
-    return sendSuccess(res, "Website information saved successfully", result);
+    if (!userId) {
+      res.status(401);
+      throw new Error("Unauthorized: User ID missing");
+    }
+
+    const result = await getWebsiteSetupService(userId);
+
+    if (!result) {
+      return sendSuccess(res, "No website setup found", null);
+    }
+
+    return sendSuccess(res, "Website setup retrieved successfully", result);
+  }
+);
+
+export const saveWebsiteSetupController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const userId = req.user?.id;
+    const payload: WebsiteSetupPayload = req.body;
+
+    if (!userId) {
+      res.status(401);
+      throw new Error("Unauthorized: User ID missing");
+    }
+
+    const result = await saveWebsiteSetupService(userId, payload);
+
+    return sendSuccess(res, "Website setup saved successfully", result);
   }
 );
