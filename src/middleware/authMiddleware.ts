@@ -45,9 +45,9 @@ export const authMiddleware = async (
     }
 
     req.user = {
-      id: data.user.id,
-      email: data.user.email,
-      role: data.user.role,
+      id: data?.user?.id||'',
+      email: data?.user?.email,
+      role: data.user?.role,
     };
     req.token = token;
 

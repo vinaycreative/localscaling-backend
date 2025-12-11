@@ -1,27 +1,16 @@
-import { Router } from "express";
-import {
-  getAdsBudgetController,
-  getBrandingController,
-  getBusinessInfoController,
-  getWebsiteSetupController,
-  saveAdsBudgetController,
-  saveBrandingController,
-  saveBusinessInfoController,
-  saveWebsiteSetupController,
-} from "./onboarding.controller";
+import { Router } from "express"
+import adsBudgetRoutes from "./ads-budget/ads-budget.routes"
+import brandingInfoRoutes from "./branding-info/branding-info.routes"
+import businessInfoRoutes from "./business-info/business-info-routes"
+import toolsAccessRoutes from "./tools-access/tools-access.routes"
+import websiteSetupRoutes from "./website-setup/website-setup.routes"
 
-const router = Router();
+const router = Router()
 
-router.get("/business-info", getBusinessInfoController);
-router.post("/business-info", saveBusinessInfoController);
+router.use("/ads-budget", adsBudgetRoutes)
+router.use("/branding-info", brandingInfoRoutes)
+router.use("/business-info", businessInfoRoutes)
+router.use("/tools-access", toolsAccessRoutes)
+router.use("/website-setup", websiteSetupRoutes)
 
-router.post("/branding", saveBrandingController);
-router.get("/branding", getBrandingController);
-
-router.get("/website-setup", getWebsiteSetupController);
-router.post("/website-setup", saveWebsiteSetupController);
-
-router.get("/ads-budget", getAdsBudgetController);
-router.post("/ads-budget", saveAdsBudgetController);
-
-export default router;
+export default router
