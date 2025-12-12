@@ -3,6 +3,7 @@ import { signJwt } from "@/config/jwt"
 import { ExchangeSessionInput, LoginInput, SignUpInput } from "./auth.schema"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
+import { AppError } from "@/utils/appError"
 
 export const loginService = async ({ email, password }: LoginInput) => {
   try {
@@ -26,11 +27,11 @@ export const loginService = async ({ email, password }: LoginInput) => {
     if (userError) {
       console.error("Supabase error:", userError)
       // Don't reveal if user exists or not for security
-      throw new Error("Invalid credentials")
+      throw new AppError("Invalid credentials")
     }
 
     if (!user) {
-      throw new Error("Invalid credentials")
+      throw new AppError("Invalid credentials")
     }
 
     console.log(`User found: ${user.id}, has password: ${!!user.password}`)
@@ -45,14 +46,14 @@ export const loginService = async ({ email, password }: LoginInput) => {
 
     if (!isPasswordValid) {
       console.log("Password mismatch for user:", user.id)
-      throw new Error("Invalid credentials")
+      throw new AppError("Invalid credentials")
     }
 
     console.log("Password validated successfully for user:", user.id)
 
     // Generate JWT token
     if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is not configured")
+      throw new AppError("JWT_SECRET is not configured")
     }
 
     const tokenPayload = {
@@ -90,11 +91,11 @@ export const loginService = async ({ email, password }: LoginInput) => {
 
     // Re-throw with appropriate message
     if (error.message.includes("credentials") || error.message.includes("Invalid")) {
-      throw new Error("Invalid credentials")
+      throw new AppError("Invalid credentials")
     }
 
     if (error.message.includes("JWT_SECRET")) {
-      throw new Error("Server configuration error")
+      throw new AppError("Server configuration error")
     }
 
     throw new Error(error.message || "Login failed")
