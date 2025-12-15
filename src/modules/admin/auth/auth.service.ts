@@ -13,7 +13,6 @@ export const loginServiceWithEmailPassword = async ({ email, password }: LoginIn
     `
     )
     .eq("email", email)
-    .eq("role", "f5ea9ffc-4256-4085-befa-0624b6292ae3")
     .single()
 
   if (userError || !user?.password) {
@@ -31,7 +30,7 @@ export const loginServiceWithEmailPassword = async ({ email, password }: LoginIn
     last_name: user.last_name || "",
     email: user.email || "",
     role: user?.role?.name || "",
-    type: "client",
+    type: "internal",
   }
   const token = generateToken(userPayload, "30d")
 
@@ -79,7 +78,7 @@ export const getLoggedInUserService = async (user_id: string) => {
     last_name: user.last_name || "",
     email: user.email || "",
     role: user?.role?.name || "",
-    type: "client",
+    type: "internal",
   }
   return {
     user: userPayload,

@@ -4,7 +4,7 @@ import { authMiddleware } from "@/middleware/authMiddleware"
 
 const router = Router()
 
+router.post("/", authMiddleware, saveBusinessInfoController)
 router.get("/", authMiddleware, getBusinessInfoController)
-router.post("/create", authMiddleware, saveBusinessInfoController)
 
 export default router

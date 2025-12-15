@@ -45,15 +45,7 @@ export type Database = {
           services_provided?: string[] | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ads_budget_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       branding_assets: {
         Row: {
@@ -101,15 +93,7 @@ export type Database = {
           updated_at?: string | null
           video_testimonials_urls?: string[] | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "branding_assets_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: true
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       branding_content: {
         Row: {
@@ -319,74 +303,6 @@ export type Database = {
           twitter_link?: string | null
           youtube_link?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "client_social_links_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: true
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      clients: {
-        Row: {
-          city: string | null
-          company_name: string
-          company_start_year: number | null
-          contact_email: string | null
-          contact_name: string | null
-          contact_number: string | null
-          country: string | null
-          created_at: string | null
-          current_website: string | null
-          id: string
-          postal_code: string | null
-          state: string | null
-          street_address: string | null
-          updated_at: string | null
-          user_id: string | null
-          vat_id: string | null
-          whatsapp_number: string | null
-        }
-        Insert: {
-          city?: string | null
-          company_name: string
-          company_start_year?: number | null
-          contact_email?: string | null
-          contact_name?: string | null
-          contact_number?: string | null
-          country?: string | null
-          created_at?: string | null
-          current_website?: string | null
-          id?: string
-          postal_code?: string | null
-          state?: string | null
-          street_address?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          vat_id?: string | null
-          whatsapp_number?: string | null
-        }
-        Update: {
-          city?: string | null
-          company_name?: string
-          company_start_year?: number | null
-          contact_email?: string | null
-          contact_name?: string | null
-          contact_number?: string | null
-          country?: string | null
-          created_at?: string | null
-          current_website?: string | null
-          id?: string
-          postal_code?: string | null
-          state?: string | null
-          street_address?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          vat_id?: string | null
-          whatsapp_number?: string | null
-        }
         Relationships: []
       }
       google_integrations: {
@@ -441,15 +357,7 @@ export type Database = {
           token_expiry?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "google_integrations_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       roles: {
         Row: {
@@ -591,15 +499,7 @@ export type Database = {
           seo_locations?: string[] | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "website_info_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: true
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       website_setup: {
         Row: {

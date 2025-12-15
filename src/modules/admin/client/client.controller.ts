@@ -4,6 +4,7 @@ import {
   createClientService,
   deleteClientService,
   getClientsService,
+  successPaymentService,
   updateClientService,
 } from "./client.service"
 import { sendSuccess } from "@/utils/response"
@@ -33,4 +34,10 @@ export const deleteClientController = async (req: Request, res: Response) => {
   const { id } = req.params
   const client = await deleteClientService(id as string)
   return sendSuccess(res, "Client deleted successfully", client)
+}
+
+export const successPaymentController = async (req: Request, res: Response) => {
+  const { id } = req.params
+  const client = await successPaymentService(id as string)
+  return sendSuccess(res, "Client payment successful", client)
 }

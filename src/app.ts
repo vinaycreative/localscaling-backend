@@ -1,6 +1,6 @@
 import { logger } from "@/config/logger"
 import { errorHandler } from "@/middleware/errorHandler"
-import v1Routes from "@/routes/client"
+
 import compression from "compression"
 import cookieParser from "cookie-parser"
 import cors from "cors"
@@ -8,6 +8,7 @@ import express from "express"
 import helmet from "helmet"
 import moment from "moment-timezone"
 import adminRoutes from "@/modules/admin/admin.route"
+import clientRoutes from "@/modules/client/client.route"
 import { adminOnlyMiddleware, authMiddleware } from "@/middleware/authMiddleware"
 const frontendUrl = process.env.FRONTEND_URL
 const frontendDevUrl = process.env.FRONTEND_DEV_URL
@@ -48,8 +49,11 @@ app.use((req, res, next) => {
 })
 
 // Routes
-app.use("/api/v1", v1Routes)
-app.use("/api/v1/admin", authMiddleware, adminOnlyMiddleware, adminRoutes)
+// Client Routes
+app.use("/api/v1/client", clientRoutes)
+
+// Admin Routes
+app.use("/api/v1/admin", adminRoutes)
 
 // Global Error Handler
 app.use(errorHandler)
