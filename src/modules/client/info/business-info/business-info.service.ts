@@ -13,21 +13,23 @@ export const getBusinessInfoService = async (userId: string) => {
     throw new AppError(`Failed to fetch client info: ${error.message}`, 500)
   }
   if (!client) {
-    return null
+    return {}
   }
   return client
 }
 
 export const saveBusinessInfoService = async (userId: string, data: BusinessFormData) => {
+  const { twitter, ...rest } = data
+
   const payload = {
-    ...data,
+    ...rest,
     user_id: userId,
+    x: twitter,
   }
 
   const { data: businessInfoData, error: businessError } = await db
     .from("business_information")
     .upsert(payload, { onConflict: "user_id" })
-    .eq("user_id", userId)
     .select()
     .single()
 
