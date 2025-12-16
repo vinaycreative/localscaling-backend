@@ -1,10 +1,11 @@
 import { db } from "@/config/db"
 import { BrandingFormData } from "./branding-info.schema"
+import { AppError } from "@/utils/appError"
 
 export const getBrandingInfoService = async (userId: string) => {
   const { data: client, error } = await db
     .from("branding_assets")
-    .select("*, client_social_links(*)")
+    .select("*")
     .eq("user_id", userId)
     .single()
 
@@ -22,6 +23,8 @@ export const getBrandingInfoService = async (userId: string) => {
 }
 
 export const saveBrandingInfoService = async (userId: string, data: BrandingFormData) => {
+  console.log("🚀 ~ saveBrandingInfoService ~ data:", data)
+  console.log("🚀 ~ saveBrandingInfoService ~ userId:", userId)
   const payload = {
     ...data,
     user_id: userId,
@@ -29,9 +32,12 @@ export const saveBrandingInfoService = async (userId: string, data: BrandingForm
 
   const { data: businessInfoData, error: clientError } = await db
     .from("branding_assets")
-    .insert(payload)
+    .upsert(payload, { onConflict: "user_id" })
+    .select()
+    .single()
+
   if (clientError) {
-    throw new Error("failed ")
+    throw new AppError(`${clientError?.message}`, 500)
   }
   return businessInfoData
 }

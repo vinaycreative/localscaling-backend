@@ -7,6 +7,7 @@ import { getBrandingInfoService, saveBrandingInfoService } from "./branding-info
 
 export const getBrandingController = asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id
+  console.log("🚀 ~ userId:", userId)
 
   if (!userId) {
     res.status(401)

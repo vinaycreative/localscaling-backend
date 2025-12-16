@@ -4,6 +4,6 @@ import { getBrandingController, saveBrandingController } from "./branding-info.c
 const router = Router()
 
 router.post("/", saveBrandingController)
-router.get("/create", getBrandingController)
+router.get("/", getBrandingController)
 
 export default router
