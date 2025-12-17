@@ -92,3 +92,51 @@ export const successPaymentService = async (id: string) => {
 
   return { user, client }
 }
+
+export const getClientProfilePageService = async (id: string) => {
+  console.log("🚀 ~ getClientProfilePageService ~ id:", id)
+  if (!id) throw new Error("Client ID is required")
+
+  try {
+    const { data: ads_budget, error: adsBudgetError } = await db
+      .from("ads_budget_location")
+      .select("*")
+      .eq("client_id", id)
+      .maybeSingle()
+    console.log("🚀 ~ getClientProfilePageService ~ ads_budget:", ads_budget)
+
+    const { data: branding_info, error: brandingInfoError } = await db
+      .from("branding_assets")
+      .select("*")
+      .eq("user_id", id)
+      .maybeSingle()
+    console.log("🚀 ~ getClientProfilePageService ~ branding_info:", branding_info)
+
+    const { data: business_info, error: businessInfoError } = await db
+      .from("business_information")
+      .select("*")
+      .eq("user_id", id)
+      .maybeSingle()
+    console.log("🚀 ~ getClientProfilePageService ~ business_info:", business_info)
+
+    const { data: toolsAccessData, error: toolsAccessError } = await db
+      .from("tools_access")
+      .select("*")
+      .eq("user_id", id)
+      .maybeSingle() // safer than single()
+    console.log("🚀 ~ getClientProfilePageService ~ toolsAccessData:", toolsAccessData)
+
+    const { data, error } = await db.from("website_setup").select("*").eq("user_id", id).single()
+    console.log("🚀 ~ getClientProfilePageService ~ data:", data)
+
+    return {
+      ads_budget: ads_budget,
+      branding_info,
+      business_info,
+      tools_access: toolsAccessData,
+      website_setup: data,
+    }
+  } catch (error) {
+    throw error
+  }
+}

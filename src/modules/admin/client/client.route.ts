@@ -5,6 +5,7 @@ import {
   updateClientController,
   deleteClientController,
   successPaymentController,
+  getClientProfilePageController,
 } from "./client.controller"
 import { adminOnlyMiddleware, authMiddleware } from "@/middleware/authMiddleware"
 
@@ -19,5 +20,6 @@ router.get("/", getClientsController)
 router.post("/", createClientController)
 router.put("/:id", updateClientController)
 router.delete("/:id", deleteClientController)
+router.get("/:id/profile", getClientProfilePageController)
 
 export default router

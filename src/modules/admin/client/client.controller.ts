@@ -3,6 +3,7 @@ import { ClientLeadInput, ClientLeadSchema } from "./client.schema"
 import {
   createClientService,
   deleteClientService,
+  getClientProfilePageService,
   getClientsService,
   successPaymentService,
   updateClientService,
@@ -40,4 +41,10 @@ export const successPaymentController = async (req: Request, res: Response) => {
   const { id } = req.params
   const client = await successPaymentService(id as string)
   return sendSuccess(res, "Client payment successful", client)
+}
+
+export const getClientProfilePageController = async (req: Request, res: Response) => {
+  const { id } = req.params
+  const client = await getClientProfilePageService(id as string)
+  return sendSuccess(res, "Client Profile Details Fetched Successfully.", client)
 }
