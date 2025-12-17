@@ -94,50 +94,49 @@ export const successPaymentService = async (id: string) => {
 }
 
 export const getClientProfilePageService = async (id: string) => {
-  console.log("🚀 ~ getClientProfilePageService ~ id:", id)
-  if (!id) throw new Error("Client ID is required")
+  const { data: clientData, error: clientError } = await db
+    .from("users")
+    .select("*")
+    .eq("client_lead_id", id)
+    .single()
+
+  const userId = clientData?.id ?? ""
 
   const { data: ads_budget, error: adsBudgetError } = await db
     .from("ads_budget_location")
     .select("*")
-    .eq("client_id", id)
+    .eq("client_id", userId)
     .maybeSingle()
-  console.log("🚀 ~ getClientProfilePageService ~ adsBudgetError:", adsBudgetError)
-  console.log("🚀 ~ getClientProfilePageService ~ ads_budget:", ads_budget)
 
   const { data: branding_info, error: brandingInfoError } = await db
     .from("branding_assets")
     .select("*")
-    .eq("user_id", id)
+    .eq("user_id", userId)
     .maybeSingle()
-  console.log("🚀 ~ getClientProfilePageService ~ brandingInfoError:", brandingInfoError)
-  console.log("🚀 ~ getClientProfilePageService ~ branding_info:", branding_info)
 
   const { data: business_info, error: businessInfoError } = await db
     .from("business_information")
     .select("*")
-    .eq("user_id", id)
+    .eq("user_id", userId)
     .maybeSingle()
-  console.log("🚀 ~ getClientProfilePageService ~ businessInfoError:", businessInfoError)
-  console.log("🚀 ~ getClientProfilePageService ~ business_info:", business_info)
 
   const { data: toolsAccessData, error: toolsAccessError } = await db
     .from("tools_access")
     .select("*")
-    .eq("user_id", id)
+    .eq("user_id", userId)
     .maybeSingle() // safer than single()
-  console.log("🚀 ~ getClientProfilePageService ~ toolsAccessError:", toolsAccessError)
-  console.log("🚀 ~ getClientProfilePageService ~ toolsAccessData:", toolsAccessData)
 
-  const { data, error } = await db.from("website_setup").select("*").eq("user_id", id).maybeSingle()
-  console.log("🚀 ~ getClientProfilePageService ~ error:", error)
-  console.log("🚀 ~ getClientProfilePageService ~ data:", data)
+  const { data, error } = await db
+    .from("website_setup")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle()
 
   return {
-    ads_budget: ads_budget,
-    branding_info,
     business_info,
+    branding_info,
     tools_access: toolsAccessData,
     website_setup: data,
+    ads_budget: ads_budget,
   }
 }
