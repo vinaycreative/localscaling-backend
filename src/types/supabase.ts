@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
@@ -16,31 +10,31 @@ export type Database = {
     Tables: {
       ads_budget_location: {
         Row: {
+          budget: number | null
           client_id: string | null
           created_at: string | null
           currency: string | null
           id: string
-          monthly_budget: number | null
           seo_locations: string[] | null
           services_provided: string[] | null
           updated_at: string | null
         }
         Insert: {
+          budget?: number | null
           client_id?: string | null
           created_at?: string | null
           currency?: string | null
           id?: string
-          monthly_budget?: number | null
           seo_locations?: string[] | null
           services_provided?: string[] | null
           updated_at?: string | null
         }
         Update: {
+          budget?: number | null
           client_id?: string | null
           created_at?: string | null
           currency?: string | null
           id?: string
-          monthly_budget?: number | null
           seo_locations?: string[] | null
           services_provided?: string[] | null
           updated_at?: string | null
@@ -49,10 +43,10 @@ export type Database = {
           {
             foreignKeyName: "ads_budget_location_client_id_fkey"
             columns: ["client_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       branding_assets: {
@@ -108,7 +102,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       branding_content: {
@@ -233,7 +227,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       client_leads: {
@@ -413,30 +407,30 @@ export type Database = {
       tools_access: {
         Row: {
           created_at: string
-          google_ads: boolean | null
-          google_analytics_4: boolean | null
-          google_search_console: boolean | null
-          google_tag_manager: boolean | null
+          ga4_access_granted: boolean | null
+          google_ads_access_granted: boolean | null
+          google_search_console_access_granted: boolean | null
+          gtm_access_granted: boolean | null
           id: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          google_ads?: boolean | null
-          google_analytics_4?: boolean | null
-          google_search_console?: boolean | null
-          google_tag_manager?: boolean | null
+          ga4_access_granted?: boolean | null
+          google_ads_access_granted?: boolean | null
+          google_search_console_access_granted?: boolean | null
+          gtm_access_granted?: boolean | null
           id?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
-          google_ads?: boolean | null
-          google_analytics_4?: boolean | null
-          google_search_console?: boolean | null
-          google_tag_manager?: boolean | null
+          ga4_access_granted?: boolean | null
+          google_ads_access_granted?: boolean | null
+          google_search_console_access_granted?: boolean | null
+          gtm_access_granted?: boolean | null
           id?: string
           updated_at?: string
           user_id?: string
@@ -445,14 +439,15 @@ export type Database = {
           {
             foreignKeyName: "tools_access_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       users: {
         Row: {
+          client_lead_id: string | null
           created_at: string
           email: string | null
           first_name: string | null
@@ -463,6 +458,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          client_lead_id?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
@@ -473,6 +469,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          client_lead_id?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
@@ -484,12 +481,19 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "users_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "client_leads"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "users_role_fkey"
             columns: ["role"]
             isOneToOne: false
             referencedRelation: "roles"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       website_info: {
@@ -572,7 +576,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
     }
@@ -604,7 +608,7 @@ export type Tables<
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -614,15 +618,13 @@ export type Tables<
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+  ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+      Row: infer R
+    }
+    ? R
     : never
+  : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
@@ -632,7 +634,7 @@ export type TablesInsert<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -642,12 +644,12 @@ export type TablesInsert<
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
+  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+      Insert: infer I
+    }
+    ? I
     : never
+  : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
@@ -657,7 +659,7 @@ export type TablesUpdate<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never = never
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -667,12 +669,12 @@ export type TablesUpdate<
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
+  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+      Update: infer U
+    }
+    ? U
     : never
+  : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
@@ -682,14 +684,14 @@ export type Enums<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never = never
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
@@ -699,14 +701,14 @@ export type CompositeTypes<
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never = never
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : never
 
 export const Constants = {
   public: {
