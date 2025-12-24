@@ -1,0 +1,24 @@
+import { asyncHandler } from "@/utils/asyncHandler"
+import { sendSuccess } from "@/utils/response"
+import { Response } from "express"
+import { AuthRequest } from "@/middleware/authMiddleware"
+import { getTicketsService } from "./tickets.service"
+import { TicketFilters } from "./tickets.types"
+import { getQueryArray } from "@/utils/query"
+
+export const getTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!req.user?.id) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+  const userId = req.user.id
+  const filters: TicketFilters = {
+    subject: req.query.subject as string | undefined,
+    category: getQueryArray(req.query, "category"),
+    priority: req.query.priority as string | undefined,
+    status: req.query.status as string | undefined,
+    created_at: req.query.created_at as string | undefined,
+  }
+  const result = await getTicketsService(userId, filters)
+
+  return sendSuccess(res, "Tickets fetched successfully", result)
+})
