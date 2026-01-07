@@ -25,10 +25,14 @@ export const getProjectsService = async (userId: string, filters?: GetProjectsFi
     query = query.eq("stage", filters.stage)
   }
 
-
   // -------- DATE FILTERS --------
   if (filters?.created_at) {
-    query = query.gte("created_at", filters.created_at)
+    const timestamp = Number(filters.created_at)
+    if (!Number.isNaN(timestamp)) {
+      const fromDate = new Date(timestamp)
+      fromDate.setHours(0, 0, 0, 0)
+      query = query.gte("created_at", fromDate.toISOString())
+    }
   }
 
   if (filters?.updated_at) {
