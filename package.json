@@ -6,6 +6,9 @@
   "author": "",
   "type": "commonjs",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node start.js",
     "build": "tsc",
