@@ -12,10 +12,12 @@ export const getTicketsService = async (userId: string, filters: TicketFilters) 
     `
     *,
     created_by (
+      id,
       first_name,
       last_name
     ),
     assigned_to (
+      id,
       first_name,
       last_name
     )
@@ -76,11 +78,12 @@ export const getTicketsService = async (userId: string, filters: TicketFilters) 
 }
 
 export const getTicketsAssigneesService = async () => {
-  const allowedRoles = ["admin", "support_admin", "support_head_admin"];
+  const allowedRoles = ["admin", "support_admin", "support_head_admin"]
 
   const { data, error } = await db
     .from("users")
-    .select(`
+    .select(
+      `
       id,
       email,
       first_name,
@@ -89,14 +92,14 @@ export const getTicketsAssigneesService = async () => {
         id,
         name
       )
-    `)
-    .in("role.name", allowedRoles); // Filter allowed roles
+    `
+    )
+    .in("role.name", allowedRoles) // Filter allowed roles
 
-  if (error) throw error;
+  if (error) throw error
 
-  return data;
-};
-
+  return data
+}
 
 export const createTicketsService = async (userId: string, payload: any) => {
   const { data, error } = await db.from("tickets").insert(payload)
