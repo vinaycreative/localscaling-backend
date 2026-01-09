@@ -7,7 +7,7 @@
   "type": "commonjs",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node -r tsconfig-paths/register dist/server.js",
+    "start": "node start.js",
     "build": "tsc",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts"
   },
