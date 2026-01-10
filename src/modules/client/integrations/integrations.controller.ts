@@ -11,6 +11,7 @@ import {
   handleGtmOAuthCallback,
   startSearchConsoleOAuth,
   handleSearchConsoleOAuthCallback,
+  disconnectIntegrationService,
 } from "./integrations.service"
 import { sendSuccess } from "@/utils/response"
 
@@ -244,4 +245,20 @@ export async function connectSearchConsole(req: Request, res: Response) {
   }
   const { authUrl } = await startSearchConsoleOAuth(clientId)
   return res.redirect(authUrl)
+}
+
+export async function disconnectIntegration(req: Request, res: Response) {
+  const { integrationId } = req.params
+  const clientId = req.user?.id
+
+  if (!integrationId || !clientId) {
+    return res.status(400).json({ message: "Invalid request" })
+  }
+
+  await disconnectIntegrationService({
+    integrationId,
+    clientId,
+  })
+
+  return sendSuccess(res, "Integration disconnected successfully", null)
 }

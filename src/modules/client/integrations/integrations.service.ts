@@ -401,3 +401,39 @@ export async function handleSearchConsoleOAuthCallback(params: {
     .eq("id", params.clientIntegrationId)
   return { success: true, message: "Search Console integration connected" }
 }
+
+export async function disconnectIntegrationService(params: {
+  integrationId: string
+  clientId: string
+}) {
+  const { integrationId, clientId } = params
+
+  // 1. Ensure integration belongs to this client
+  const { data: integration, error } = await db
+    .from("client_integrations")
+    .select("id")
+    .eq("id", integrationId)
+    .eq("client_id", clientId)
+    .single()
+
+  if (error || !integration) {
+    throw new Error("Integration not found or access denied")
+  }
+
+  // 2. Delete OAuth credentials
+  await db.from("oauth_credentials").delete().eq("client_integration_id", integrationId)
+
+  // 3. Reset integration state
+  await db
+    .from("client_integrations")
+    .update({
+      status: "revoked",
+      external_account_id: "",
+      external_account_name: "",
+      connected_at: undefined,
+      last_verified_at: undefined,
+    })
+    .eq("id", integrationId)
+
+  return { success: true, message: "Integration disconnected" }
+}

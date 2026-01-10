@@ -14,7 +14,7 @@
     },
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "seed.js"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }

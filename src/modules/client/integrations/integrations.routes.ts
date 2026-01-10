@@ -10,6 +10,7 @@ import {
   googleOAuthCallback,
   connectGtm,
   connectSearchConsole,
+  disconnectIntegration,
 } from "./integrations.controller"
 
 const router = Router()
@@ -30,5 +31,8 @@ router.get("/google/gtm/connect", connectGtm)
 
 // Search Console
 router.get("/google/search-console/connect", connectSearchConsole)
+
+// Disconnect Integration
+router.post("/google/disconnect/:integrationId", disconnectIntegration)
 
 export default router
