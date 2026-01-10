@@ -1,5 +1,3 @@
-// src/modules/client/integrations/integrations.service.ts
-
 import {
   generateGa4AuthUrl,
   exchangeCodeForTokens,
