@@ -27,7 +27,12 @@ export async function getAllIntegrationStatusController(req: Request, res: Respo
  * Redirect client to Google OAuth consent screen
  */
 export async function connectGa4(req: Request, res: Response) {
-  const { authUrl } = await startGa4OAuth()
+  const clientId = req.user?.id
+
+  if (!clientId) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+  const { authUrl } = await startGa4OAuth(clientId)
   return res.redirect(authUrl)
 }
 

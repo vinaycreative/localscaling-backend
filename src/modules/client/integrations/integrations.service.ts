@@ -11,8 +11,45 @@ import { db } from "@/config/db" // adjust path if needed
  * STEP 4.1
  * Start GA4 OAuth flow
  */
-export async function startGa4OAuth(): Promise<{ authUrl: string }> {
-  const authUrl = generateGa4AuthUrl()
+// export async function startGa4OAuth(): Promise<{ authUrl: string }> {
+//   const authUrl = generateGa4AuthUrl()
+//   return { authUrl }
+// }
+export async function startGa4OAuth(userId: string) {
+  const { data: integration } = await db
+    .from("client_integrations")
+    .upsert(
+      {
+        client_id: userId,
+        external_account_id: "",
+        external_account_name: "",
+        provider: "google",
+        tool: "ga4",
+        status: "pending",
+        scopes: GOOGLE_SCOPES.GA4,
+        connected_at: new Date().toISOString(),
+      },
+      { onConflict: "client_id,provider,tool" }
+    )
+    .select()
+    .single()
+
+  if (!integration) {
+    throw new Error("Failed to create GA4 integration")
+  }
+
+  const state = Buffer.from(
+    JSON.stringify({
+      integrationId: integration.id,
+      tool: "ga4",
+    })
+  ).toString("base64")
+
+  const authUrl = generateGoogleAuthUrl({
+    scopes: GOOGLE_SCOPES.GA4,
+    state,
+  })
+
   return { authUrl }
 }
 
