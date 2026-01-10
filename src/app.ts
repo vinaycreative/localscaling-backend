@@ -50,7 +50,7 @@ app.use((req, res, next) => {
 
 // Routes
 
-app.get("/healthz", (req: Request, res: Response) => {
+app.get("/healthz", (req, res) => {
   res.status(200).json({ message: "Server is running" })
 })
 
