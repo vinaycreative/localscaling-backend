@@ -49,11 +49,6 @@ app.use((req, res, next) => {
 })
 
 // Routes
-
-app.get("/healthz", (req, res) => {
-  res.status(200).json({ message: "Server is running" })
-})
-
 // Client Routes
 app.use("/api/v1/client", clientRoutes)
 
