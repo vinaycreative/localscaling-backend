@@ -7,14 +7,12 @@
   "type": "commonjs",
   "main": "dist/server.js",
   "engines": {
-    "node": ">=18.0.0"
+    "node": "20.x"
   },
   "scripts": {
-    "scripts": {
-      "build": "tsc && tsc-paths -p tsconfig.json -s src -o dist",
-      "start": "node dist/server.js",
-      "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts"
-    }
+    "build": "tsc && tsc-paths -p tsconfig.json -s src -o dist",
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
