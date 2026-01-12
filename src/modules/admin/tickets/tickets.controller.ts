@@ -2,7 +2,12 @@ import { asyncHandler } from "@/utils/asyncHandler"
 import { sendSuccess } from "@/utils/response"
 import { Response } from "express"
 import { AuthRequest } from "@/middleware/authMiddleware"
-import { createTicketsService, getTicketsAssigneesService, getTicketsService } from "./tickets.service"
+import {
+  createTicketsService,
+  getTicketsAssigneesService,
+  getTicketsService,
+  updateTicketsService,
+} from "./tickets.service"
 import { TicketFilters } from "./tickets.types"
 import { getQueryArray } from "@/utils/query"
 
@@ -26,25 +31,39 @@ export const getTicketsController = asyncHandler(async (req: AuthRequest, res: R
   return sendSuccess(res, "Tickets fetched successfully", result)
 })
 
-export const getTicketsAssigneesController = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getTicketsAssigneesController = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    if (!req.user?.id) {
+      return res.status(401).json({ message: "Unauthorized" })
+    }
+    const userId = req.user.id
+
+    const result = await getTicketsAssigneesService()
+
+    return sendSuccess(res, "Tickets Assigneees fetched successfully", result)
+  }
+)
+
+// export const createTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
+//   if (!req.user?.id) {
+//     return res.status(401).json({ message: "Unauthorized" })
+//   }
+//   const userId = req.user.id
+//   const payload = { ...req.body, created_by: userId, status: req.body.status ?? "open" }
+
+//   const result = await createTicketsService(userId, payload)
+
+//   return sendSuccess(res, "Tickets Created successfully", result)
+// })
+
+export const updateTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
   if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" })
   }
   const userId = req.user.id
+  const payload = { ...req.body }
 
-  const result = await getTicketsAssigneesService()
+  const result = await updateTicketsService(payload)
 
-  return sendSuccess(res, "Tickets Assigneees fetched successfully", result)
-})
-
-export const createTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
-  if (!req.user?.id) {
-    return res.status(401).json({ message: "Unauthorized" })
-  }
-  const userId = req.user.id
-  const payload = { ...req.body, created_by: userId, status: req.body.status ?? "open" }
-
-  const result = await createTicketsService(userId, payload)
-
-  return sendSuccess(res, "Tickets Created successfully", result)
+  return sendSuccess(res, "Tickets Updated successfully", result)
 })
