@@ -12,6 +12,7 @@ import {
   connectSearchConsole,
   disconnectIntegration,
 } from "./integrations.controller"
+import webflowRoutes from "./webflow/webflow.routes"
 
 const router = Router()
 
@@ -34,5 +35,8 @@ router.get("/google/search-console/connect", connectSearchConsole)
 
 // Disconnect Integration
 router.post("/google/disconnect/:integrationId", disconnectIntegration)
+
+// Webflow
+router.use("/webflow", webflowRoutes)
 
 export default router

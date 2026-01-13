@@ -13,6 +13,14 @@ const envSchema = z.object({
   COOKIE_DOMAIN: z.string().optional(),
   EMAIL_USER: z.string(),
   EMAIL_PASS: z.string(),
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_REDIRECT_URI: z.string(),
+  WEBFLOW_CLIENT_ID: z.string(),
+  WEBFLOW_CLIENT_SECRET: z.string(),
+  WEBFLOW_SECRET: z.string(),
+  WEBFLOW_REDIRECT_URI: z.string(),
+  WEBFLOW_SCOPES: z.string(),
 })
 
 export const env = envSchema.parse(process.env)

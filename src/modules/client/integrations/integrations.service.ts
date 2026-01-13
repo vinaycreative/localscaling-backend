@@ -192,6 +192,7 @@ export async function getAllIntegrationStatus(client_id: string) {
     { tool: "google_ads", provider: "google" },
     { tool: "gtm", provider: "google" },
     { tool: "search_console", provider: "google" },
+    { tool: "webflow", provider: "webflow" },
   ]
 
   // If DB fails, return all as not connected
@@ -430,7 +431,7 @@ export async function handleSearchConsoleOAuthCallback(params: {
   await db
     .from("client_integrations")
     .update({
-      status: "pending",
+      status: "connected",
       last_verified_at: new Date().toISOString(),
     })
     .eq("id", params.clientIntegrationId)

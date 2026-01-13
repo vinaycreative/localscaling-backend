@@ -121,7 +121,9 @@ export async function googleAdsOAuthCallback(req: Request, res: Response) {
   const { code, state } = req.query
 
   if (!code || typeof code !== "string" || !state || typeof state !== "string") {
-    return res.status(400).json({ message: "Invalid OAuth callback" })
+    return res.redirect(
+      `${process.env.FRONTEND_DEV_URL}/tasks/tools-access?error=Invalid OAuth callback`
+    )
   }
 
   await handleGoogleAdsOAuthCallback({

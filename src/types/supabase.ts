@@ -437,6 +437,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          assigned_to: string | null
           created_at: string
           id: string
           name: string | null
@@ -445,6 +446,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string
           id?: string
           name?: string | null
@@ -453,6 +455,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string
           id?: string
           name?: string | null
@@ -726,9 +729,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      integration_provider: "google"
+      integration_provider: "google" | "webflow"
       integration_status: "pending" | "connected" | "revoked" | "error"
-      integration_tool: "google_ads" | "ga4" | "gtm" | "search_console"
+      integration_tool:
+        | "google_ads"
+        | "ga4"
+        | "gtm"
+        | "search_console"
+        | "webflow"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -856,9 +864,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      integration_provider: ["google"],
+      integration_provider: ["google", "webflow"],
       integration_status: ["pending", "connected", "revoked", "error"],
-      integration_tool: ["google_ads", "ga4", "gtm", "search_console"],
+      integration_tool: [
+        "google_ads",
+        "ga4",
+        "gtm",
+        "search_console",
+        "webflow",
+      ],
     },
   },
 } as const
