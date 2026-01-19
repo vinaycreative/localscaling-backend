@@ -108,10 +108,13 @@ export const createTicketsService = async (userId: string, payload: any) => {
   return data
 }
 
-export const updateTicketsService = async (payload: any) => {
-  console.log("🚀 ~ updateTicketsService ~ payload:", payload)
-  const { data, error } = await db.from("tickets").update(payload).eq("id", payload?.id)
-  console.log("🚀 ~ createTicketsService ~ error:", error)
+export const updateTicketsService = async (payload: any  , id:string) => {
+const { data, error } = await db.from("tickets").update(payload).eq("id", id).select()
 
-  return data
+  if (error) {
+    console.error("🚀 ~ updateTicketsService ~ error:", error)
+    throw error
+  }
+
+  return data?.[0]
 }

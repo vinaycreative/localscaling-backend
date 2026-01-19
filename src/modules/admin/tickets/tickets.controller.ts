@@ -57,13 +57,17 @@ export const getTicketsAssigneesController = asyncHandler(
 // })
 
 export const updateTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { id } = req.params
+  const payload = { ...req.body }
+  
   if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" })
   }
-  const userId = req.user.id
-  const payload = { ...req.body }
+  if (!id) {
+    return res.status(401).json({ message: "ID Is required to update Ticket" })
+  }
 
-  const result = await updateTicketsService(payload)
+  const result = await updateTicketsService(payload, id)
 
   return sendSuccess(res, "Tickets Updated successfully", result)
 })
