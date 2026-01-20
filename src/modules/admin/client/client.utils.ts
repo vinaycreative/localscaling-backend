@@ -2,6 +2,7 @@ import { env } from "@/config/env"
 import { transporter } from "@/config/nodemailer"
 import { AppError } from "@/utils/appError"
 import { GetClientsFilters } from "./client.type"
+import nodemailer from "nodemailer"
 
 // send email to client welcome with login credentials
 export const sendWelcomeEmail = async (email: string, password: string) => {
@@ -9,37 +10,39 @@ export const sendWelcomeEmail = async (email: string, password: string) => {
     const mailOptions = {
       from: env.EMAIL_USER,
       to: email,
-      subject: "Welcome to our Local Scaling platform",
-      text: `Welcome to our Local Scaling platform. Your login credentials are below:`,
+      subject: "Welcome to Local Scaling - Your Account Credentials",
+      text: `Your login credentials for Local Scaling are below:`,
       html: `
-        <h1>Welcome to our Local Scaling platform</h1>
+        <h1>Welcome to Local Scaling</h1>
         <p>Your login credentials</p>
         <p>Email: ${email}</p>
         <p>Password: ${password}</p>
         <p>Please login to your account to get started</p>
-        <a href="http://localhost:3000/login">Login</a>
+        <a href="http://localhost:3000/login" style="background-color: #007bff; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600;">Login to Your Account</a>
         <p>Thank you for choosing our platform</p>
         <p>Best regards,</p>
         <p>Local Scaling Team</p>
       `,
     }
-    await transporter.sendMail(mailOptions)
+    const info = await transporter.sendMail(mailOptions)
+    console.log("Message sent: %s", info.messageId);
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
   } catch (error) {
     throw new AppError(`Failed to send welcome email: ${error}`, 500)
   }
 }
 
-export const welcomeEmailWithPaymentLink = async (email: string, id: string) => {
+export const welcomeEmailWithPaymentLink = async (email: string, paymentUrl: string) => {
   try {
     const mailOptions = {
       from: env.EMAIL_USER,
       to: email,
-      subject: "Welcome to our Local Scaling platform",
-      text: `Welcome to our Local Scaling platform. Your payment link is below:`,
+      subject: "Action Required: Complete Your Payment - Local Scaling",
+      text: `To get started with Local Scaling, please complete your payment using the link below:`,
       html: `
-        <h1>Welcome to our Local Scaling platform</h1>
+        <h1>Complete Your Registration</h1>
         <p>Your payment link</p>
-        <a href="http://localhost:3000/payment?success=${id}">Click here to pay</a>
+        <a href="${paymentUrl}" target="_blank" rel="noreferrer" style="background-color: #28a745; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: 600;">Click here to pay</a>
         <p>Please pay to activate your account</p>
         <p>Thank you for choosing our platform</p>
         <p>Best regards,</p>

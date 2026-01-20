@@ -3,6 +3,7 @@ import { AppError } from "@/utils/appError"
 import { ClientLeadInput, GetClientsFilters } from "./client.type"
 import bcrypt from "bcryptjs"
 import { sendWelcomeEmail, welcomeEmailWithPaymentLink } from "./client.utils"
+import { createPaymentLink } from "@/modules/payments/stripe/stripe.service"
 
 export const getClientsService = async (userId: string, filters?: GetClientsFilters) => {
   const page = filters?.page ?? 1
@@ -101,9 +102,32 @@ export const createClientService = async (user_id: string, data: ClientLeadInput
   }
   const { data: client, error } = await db.from("client_leads").insert(payload).select().single()
   if (error) throw new AppError(`Failed to create client lead: ${error.message}`, 500)
+
+
+  const amount = parseFloat(client?.monthly_payment_excluding_taxes || "0")
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new AppError("Valid monthly payment amount is required to generate payment link", 400)
+  }
+
+  const description =
+    client?.company_name?.trim() ||
+    client?.name?.trim() ||
+    "Local Scaling subscription"
+
+  const paymentLink = await createPaymentLink({
+    clientId: client.id,
+    clientEmail: client?.email ?? "",
+    amount,
+    description,
+  })
+
+  await db.from("client_leads").update({ payment_link: paymentLink }).eq("id", client.id)
+
   // Send Welcome and Payment link to client
-  await welcomeEmailWithPaymentLink(client?.email ?? "", client?.id ?? "")
-  return client ?? null
+  await welcomeEmailWithPaymentLink(client.email!, paymentLink)
+
+  const clientWithPaymentLink = client ? { ...client, payment_link: paymentLink } : null
+  return clientWithPaymentLink
 }
 
 export const updateClientService = async (id: string, data: ClientLeadInput) => {

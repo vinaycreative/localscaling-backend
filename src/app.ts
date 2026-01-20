@@ -12,11 +12,14 @@ import clientRoutes from "@/modules/client/client.route"
 import { adminOnlyMiddleware, authMiddleware } from "@/middleware/authMiddleware"
 const frontendUrl = process.env.FRONTEND_URL
 const frontendDevUrl = process.env.FRONTEND_DEV_URL
-
+import stripeWebhookRouter from "@/modules/payments/webhook/webhook.route"
+import paymentRoutes from "@/modules/payments/payment.route"
 const app = express()
 app.use(cookieParser())
 
 const allowedOrigins = [frontendUrl, frontendDevUrl, "http://localhost:3000"]
+app.use('/webhook', stripeWebhookRouter);
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(
@@ -50,10 +53,16 @@ app.use((req, res, next) => {
 
 // Routes
 // Client Routes
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({ message: "Server is running" })
+})
 app.use("/api/v1/client", clientRoutes)
 
 // Admin Routes
 app.use("/api/v1/admin", adminRoutes)
+
+// Payment Routes
+app.use("/api/v1/payments", paymentRoutes)
 
 // Global Error Handler
 app.use(errorHandler)

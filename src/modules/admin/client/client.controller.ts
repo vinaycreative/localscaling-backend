@@ -13,10 +13,7 @@ import { getClientFiltersUtil } from "./client.utils"
 
 export const getClientsController = async (req: Request, res: Response) => {
   const user_id = req.user?.id || ""
-   
-    
   const clients = await getClientsService(user_id , getClientFiltersUtil(req.query))
-  console.log("🚀 ~ getClientsController ~ clients:", clients)
   return sendSuccess(res, "Clients fetched successfully", clients)
 }
 

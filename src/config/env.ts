@@ -21,6 +21,9 @@ const envSchema = z.object({
   WEBFLOW_SECRET: z.string(),
   WEBFLOW_REDIRECT_URI: z.string(),
   WEBFLOW_SCOPES: z.string(),
+  STRIPE_SECRET_KEY: z.string(),
+  STRIPE_WEBHOOK_SECRET: z.string(),
+  APP_BASE_URL: z.string(),
 })
 
 export const env = envSchema.parse(process.env)
