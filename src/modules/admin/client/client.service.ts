@@ -158,8 +158,8 @@ export const successPaymentService = async (id: string) => {
     .single()
 
   console.log("id: ", id)
-  console.log(client)
-  console.log(error)
+  console.log("client : ", client)
+  console.log("client error: ", error)
 
   if (!client) throw new AppError(`Client not found`, 404)
 
@@ -182,16 +182,22 @@ export const successPaymentService = async (id: string) => {
     .select("*")
     .eq("email", client?.email ?? "")
     .single()
-  if (existingUserError)
-    throw new AppError(`Failed to check user: ${existingUserError.message}`, 500)
-  if (existingUser) throw new AppError(`Payment already processed`, 400)
+
+    console.log("existingUser: ", existingUser)
+    console.log("existingUserError: ", existingUserError)
+  // if (existingUserError)
+  //   throw new AppError(`Failed to check user: ${existingUserError.message}`, 500)
+  // if (existingUser) throw new AppError(`Payment already processed`, 400)
 
   const { data: user, error: userError } = await db
     .from("users")
     .insert(userPayload)
     .select()
     .single()
-  if (userError) throw new AppError(`Failed to create user: ${userError.message}`, 500)
+
+    console.log("userError: ", userError)
+    console.log("user: ", user)
+  // if (userError) throw new AppError(`Failed to create user: ${userError.message}`, 500)
 
   // send welcome email
   await sendWelcomeEmail(user?.email ?? "", password)

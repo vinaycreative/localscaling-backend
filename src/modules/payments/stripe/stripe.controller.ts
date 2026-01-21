@@ -35,7 +35,7 @@ export const sendTestPaymentLink = asyncHandler(async (req: Request, res: Respon
   }
 
   const paymentUrl = await createPaymentLink({
-    clientId: "test-client-id",
+    clientId: "0a1c13aa-b4e8-4b58-b296-f429fb694e47",
     clientEmail: email,
     amount,
     description: description || 'Test payment',
