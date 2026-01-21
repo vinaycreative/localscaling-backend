@@ -15,11 +15,13 @@ export const getTicketsService = async (userId: string, filters: TicketFilters) 
     *,
     created_by (
       first_name,
-      last_name
+      last_name,
+      email
     ),
     assigned_to (
       first_name,
-      last_name
+      last_name,
+      email
     )
   `,
       { count: "exact" }

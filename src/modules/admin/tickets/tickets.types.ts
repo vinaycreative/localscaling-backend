@@ -6,6 +6,7 @@ export type TicketFilters = {
   category?: string[] | null
   priority?: string | null
   status?: string | null
+  assigned_to?: string | null
   created_at?: string | null
 }
 

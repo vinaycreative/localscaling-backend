@@ -37,6 +37,9 @@ export const getTicketsService = async (userId: string, filters: TicketFilters) 
   }
 
   // MULTI-SELECT FILTERS
+  if (filters.assigned_to?.trim()) {
+    query = query.eq("assigned_to", filters.assigned_to.trim())
+  }
   if (filters.category?.length) {
     query = query.in("category", filters.category)
   }
@@ -110,8 +113,8 @@ export const createTicketsService = async (userId: string, payload: any) => {
   return data
 }
 
-export const updateTicketsService = async (payload: any  , id:string) => {
-const { data, error } = await db.from("tickets").update(payload).eq("id", id).select()
+export const updateTicketsService = async (payload: any, id: string) => {
+  const { data, error } = await db.from("tickets").update(payload).eq("id", id).select()
 
   if (error) {
     console.error("🚀 ~ updateTicketsService ~ error:", error)

@@ -25,6 +25,7 @@ export const getTicketsController = asyncHandler(async (req: AuthRequest, res: R
     priority: req.query.priority as string | undefined,
     status: req.query.status as string | undefined,
     created_at: req.query.created_at as string | undefined,
+    assigned_to: req.query.assigned_to as string | undefined,
   }
   const result = await getTicketsService(userId, filters)
 
