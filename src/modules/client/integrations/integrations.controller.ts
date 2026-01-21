@@ -78,7 +78,7 @@ export async function ga4OAuthCallback(req: Request, res: Response) {
 export async function listGa4Properties(req: Request, res: Response) {
   const { integrationId } = req.params
   console.log("integrationId: ", integrationId)
-  const properties = await getGa4Properties(integrationId)
+  const properties = await getGa4Properties(integrationId as string)
 
   return sendSuccess(res, "GA4 properties fetched successfully", properties)
 }
@@ -96,7 +96,7 @@ export async function verifyGa4(req: Request, res: Response) {
   }
 
   await verifyGa4Integration({
-    clientIntegrationId: integrationId,
+    clientIntegrationId: integrationId as string,
     propertyId: property_id,
     propertyName: property_name,
   })
@@ -263,7 +263,7 @@ export async function disconnectIntegration(req: Request, res: Response) {
   }
 
   await disconnectIntegrationService({
-    integrationId,
+    integrationId: integrationId as string,
     clientId,
   })
 

@@ -34,7 +34,7 @@ export async function webflowOAuthCallback(req: Request, res: Response) {
 
 export async function listWebflowSitesController(req: Request, res: Response) {
   const { integrationId } = req.params
-  const sites = await getWebflowSites(integrationId)
+  const sites = await getWebflowSites(integrationId as string)
   return sendSuccess(res, "Webflow sites fetched", sites)
 }
 
@@ -43,7 +43,7 @@ export async function verifyWebflowController(req: Request, res: Response) {
   const { site_id, site_name } = req.body
 
   await verifyWebflowIntegration({
-    integrationId,
+    integrationId: integrationId as string,
     siteId: site_id,
     siteName: site_name,
   })
