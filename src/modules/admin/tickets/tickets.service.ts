@@ -115,7 +115,14 @@ export const createTicketsService = async (userId: string, payload: any) => {
 }
 
 export const updateTicketsService = async (payload: any, id: string) => {
-  const { data, error } = await db.from("tickets").update(payload).eq("id", id).select()
+  const { data, error } = await db
+    .from("tickets")
+    .update({
+      ...payload,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .select()
 
   if (error) {
     console.error("🚀 ~ updateTicketsService ~ error: Arey", error)
@@ -134,7 +141,10 @@ export const bulkUpdateTicketsService = async (payload: any) => {
 
   const { data, error } = await db
     .from("tickets")
-    .update(updates) // assigned_to, priority, status
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    }) // assigned_to, priority, status
     .in("id", ids) // WHERE id IN (...)
     .select() // optional
 
@@ -145,8 +155,8 @@ export const bulkUpdateTicketsService = async (payload: any) => {
       hint: (error as any).hint,
       code: (error as any).code,
     })
-    throw new  AppError(error.message)
+    throw new AppError(error.message)
   }
 
-  return data
+  return null
 }
