@@ -3,6 +3,7 @@ import { sendSuccess } from "@/utils/response"
 import { Response } from "express"
 import { AuthRequest } from "@/middleware/authMiddleware"
 import {
+  bulkUpdateTicketsService,
   createTicketsService,
   getTicketsAssigneesService,
   getTicketsService,
@@ -42,7 +43,7 @@ export const getTicketsAssigneesController = asyncHandler(
     const result = await getTicketsAssigneesService()
 
     return sendSuccess(res, "Tickets Assigneees fetched successfully", result)
-  }
+  },
 )
 
 // export const createTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
@@ -60,7 +61,7 @@ export const getTicketsAssigneesController = asyncHandler(
 export const updateTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
   const { id } = req.params
   const payload = { ...req.body }
-  
+
   if (!req.user?.id) {
     return res.status(401).json({ message: "Unauthorized" })
   }
@@ -69,6 +70,17 @@ export const updateTicketsController = asyncHandler(async (req: AuthRequest, res
   }
 
   const result = await updateTicketsService(payload, id)
+
+  return sendSuccess(res, "Tickets Updated successfully", result)
+})
+
+export const bulkUpdateTicketsController = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const payload = { ...req.body }
+
+  if (!req.user?.id) {
+    return res.status(401).json({ message: "Unauthorized" })
+  }
+  const result = await bulkUpdateTicketsService(payload)
 
   return sendSuccess(res, "Tickets Updated successfully", result)
 })

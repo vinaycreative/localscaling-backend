@@ -1,5 +1,6 @@
 import { db } from "@/config/db"
 import { CreateTicketPayload, TicketFilters } from "./tickets.types"
+import { AppError } from "@/utils/appError"
 export const getTicketsService = async (userId: string, filters: TicketFilters) => {
   console.log("🚀 ~ getTicketsService ~ filters:", filters)
   const page = filters.page ?? 1
@@ -24,7 +25,7 @@ export const getTicketsService = async (userId: string, filters: TicketFilters) 
       email
     )
   `,
-    { count: "exact" }
+    { count: "exact" },
   )
 
   // TEXT SEARCH
@@ -97,7 +98,7 @@ export const getTicketsAssigneesService = async () => {
         id,
         name
       )
-    `
+    `,
     )
     .in("role.name", allowedRoles) // Filter allowed roles
 
@@ -117,9 +118,35 @@ export const updateTicketsService = async (payload: any, id: string) => {
   const { data, error } = await db.from("tickets").update(payload).eq("id", id).select()
 
   if (error) {
-    console.error("🚀 ~ updateTicketsService ~ error:", error)
+    console.error("🚀 ~ updateTicketsService ~ error: Arey", error)
     throw error
   }
 
   return data?.[0]
+}
+
+export const bulkUpdateTicketsService = async (payload: any) => {
+  const { ids, ...updates } = payload
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    throw new AppError("ids must be a non-empty array of strings")
+  }
+
+  const { data, error } = await db
+    .from("tickets")
+    .update(updates) // assigned_to, priority, status
+    .in("id", ids) // WHERE id IN (...)
+    .select() // optional
+
+  if (error) {
+    console.error("Supabase bulk update failed:", {
+      message: error.message,
+      details: (error as any).details,
+      hint: (error as any).hint,
+      code: (error as any).code,
+    })
+    throw new  AppError(error.message)
+  }
+
+  return data
 }
